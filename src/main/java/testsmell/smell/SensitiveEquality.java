@@ -39,12 +39,20 @@ public class SensitiveEquality extends AbstractSmell {
     }
 
     /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
+    /**
      * Analyze the test file for test methods the 'Sensitive Equality' smell
      */
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit, CompilationUnit productionFileCompilationUnit, String testFileName, String productionFileName) throws FileNotFoundException {
-        SensitiveEquality.ClassVisitor classVisitor;
-        classVisitor = new SensitiveEquality.ClassVisitor();
+        ClassVisitor classVisitor;
+        classVisitor = new ClassVisitor();
         classVisitor.visit(testFileCompilationUnit, null);
     }
 

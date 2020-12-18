@@ -2,8 +2,6 @@ import testsmell.AbstractSmell;
 import testsmell.ResultsWriter;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
-import testsmell.smell.AssertionRoulette;
-import testsmell.smell.EagerTest;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,7 +27,8 @@ public class Main {
             }
         }
 
-        TestSmellDetector testSmellDetector = new TestSmellDetector();
+
+        TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
 
         /*
           Read the input file and build the TestFile objects
@@ -64,11 +63,12 @@ public class Main {
 
         columnNames = testSmellDetector.getTestSmellNames();
         columnNames.add(0, "App");
-        columnNames.add(1, "TestClass");
+        columnNames.add(1, "Version");
         columnNames.add(2, "TestFilePath");
         columnNames.add(3, "ProductionFilePath");
         columnNames.add(4, "RelativeTestFilePath");
         columnNames.add(5, "RelativeProductionFilePath");
+        columnNames.add(6, "NumberOfTestMethods");
 
         resultsWriter.writeColumnName(columnNames);
 
@@ -89,14 +89,15 @@ public class Main {
             //write output
             columnValues = new ArrayList<>();
             columnValues.add(file.getApp());
-            columnValues.add(file.getTestFileName());
+            columnValues.add(file.getTagName());
             columnValues.add(file.getTestFilePath());
             columnValues.add(file.getProductionFilePath());
             columnValues.add(file.getRelativeTestFilePath());
             columnValues.add(file.getRelativeProductionFilePath());
+            columnValues.add(String.valueOf(file.getNumberOfTestMethods()));
             for (AbstractSmell smell : tempFile.getTestSmells()) {
                 try {
-                    columnValues.add(String.valueOf(smell.getHasSmell()));
+                    columnValues.add(String.valueOf(smell.getNumberOfSmells()));
                 }
                 catch (NullPointerException e){
                     columnValues.add("");

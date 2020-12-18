@@ -44,12 +44,20 @@ public class PrintStatement extends AbstractSmell {
     }
 
     /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
+    /**
      * Analyze the test file for test methods that print output to the console
      */
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit, CompilationUnit productionFileCompilationUnit, String testFileName, String productionFileName) throws FileNotFoundException {
-        PrintStatement.ClassVisitor classVisitor;
-        classVisitor = new PrintStatement.ClassVisitor();
+        ClassVisitor classVisitor;
+        classVisitor = new ClassVisitor();
         classVisitor.visit(testFileCompilationUnit, null);
     }
 

@@ -8,6 +8,8 @@ import testsmell.smell.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +24,6 @@ public class TestSmellDetector {
     public TestSmellDetector() {
         initializeSmells();
     }
-
-    public TestSmellDetector(boolean initialize) {}
 
     private void initializeSmells(){
         testSmells = new ArrayList<>();
@@ -48,10 +48,6 @@ public class TestSmellDetector {
         testSmells.add(new ResourceOptimism());
         testSmells.add(new MagicNumberTest());
         testSmells.add(new DependentTest());
-    }
-
-    public void setTestSmells(List<AbstractSmell> testSmells) {
-        this.testSmells = testSmells;
     }
 
     /**
@@ -81,23 +77,28 @@ public class TestSmellDetector {
 
         if(!StringUtils.isEmpty(testFile.getTestFilePath())) {
             testFileInputStream = new FileInputStream(testFile.getTestFilePath());
-            testFileCompilationUnit = JavaParser.parse(testFileInputStream);
+            testFileCompilationUnit = JavaParser.parse(testFileInputStream, StandardCharsets.ISO_8859_1);
         }
 
         if(!StringUtils.isEmpty(testFile.getProductionFilePath())){
             productionFileInputStream = new FileInputStream(testFile.getProductionFilePath());
-            productionFileCompilationUnit = JavaParser.parse(productionFileInputStream);
+            productionFileCompilationUnit = JavaParser.parse(productionFileInputStream, StandardCharsets.ISO_8859_1);
         }
 
-//        initializeSmells();
+        initializeSmells();
         for (AbstractSmell smell : testSmells) {
             try {
                 smell.runAnalysis(testFileCompilationUnit, productionFileCompilationUnit,testFile.getTestFileNameWithoutExtension(),testFile.getProductionFileNameWithoutExtension());
             } catch (FileNotFoundException e) {
                 testFile.addSmell(null);
+
                 continue;
             }
             testFile.addSmell(smell);
+            // Gets number of test methods via Assertion Roulette code
+            if (testFile.getNumberOfTestMethods() == 0){
+                testFile.setNumberOfTestMethods(smell.getSmellyElements().size());
+            }
         }
 
         return testFile;

@@ -52,6 +52,14 @@ public class LazyTest extends AbstractSmell {
     }
 
     /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
+    /**
      * Analyze the test file for test methods that exhibit the 'Lazy Test' smell
      */
     @Override
@@ -60,12 +68,12 @@ public class LazyTest extends AbstractSmell {
         if (productionFileCompilationUnit == null)
             throw new FileNotFoundException();
 
-        LazyTest.ClassVisitor classVisitor;
+        ClassVisitor classVisitor;
 
-        classVisitor = new LazyTest.ClassVisitor(PRODUCTION_FILE);
+        classVisitor = new ClassVisitor(PRODUCTION_FILE);
         classVisitor.visit(productionFileCompilationUnit, null);
 
-        classVisitor = new LazyTest.ClassVisitor(TEST_FILE);
+        classVisitor = new ClassVisitor(TEST_FILE);
         classVisitor.visit(testFileCompilationUnit, null);
 
         for (MethodUsage method : calledProductionMethods) {

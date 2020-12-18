@@ -39,10 +39,18 @@ public class DefaultTest extends AbstractSmell {
         return smellyElementList.stream().filter(x -> x.getHasSmell()).count() >= 1;
     }
 
+    /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit,CompilationUnit productionFileCompilationUnit, String testFileName, String productionFileName) throws FileNotFoundException {
-        DefaultTest.ClassVisitor classVisitor;
-        classVisitor = new DefaultTest.ClassVisitor();
+        ClassVisitor classVisitor;
+        classVisitor = new ClassVisitor();
         classVisitor.visit(testFileCompilationUnit, null);
     }
 

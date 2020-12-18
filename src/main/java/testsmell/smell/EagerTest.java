@@ -24,7 +24,6 @@ public class EagerTest extends AbstractSmell {
     private String productionClassName;
     private List<SmellyElement> smellyElementList;
     private List<MethodDeclaration> productionMethods;
-    private int eagerCount;
 
     public EagerTest() {
         productionMethods = new ArrayList<>();
@@ -48,6 +47,14 @@ public class EagerTest extends AbstractSmell {
     }
 
     /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
+    /**
      * Analyze the test file for test methods that exhibit the 'Eager Test' smell
      */
     @Override
@@ -56,14 +63,14 @@ public class EagerTest extends AbstractSmell {
         if (productionFileCompilationUnit == null)
             throw new FileNotFoundException();
 
-        EagerTest.ClassVisitor classVisitor;
+        ClassVisitor classVisitor;
 
-        classVisitor = new EagerTest.ClassVisitor(PRODUCTION_FILE);
+        classVisitor = new ClassVisitor(PRODUCTION_FILE);
         classVisitor.visit(productionFileCompilationUnit, null);
 
-        classVisitor = new EagerTest.ClassVisitor(TEST_FILE);
+        classVisitor = new ClassVisitor(TEST_FILE);
         classVisitor.visit(testFileCompilationUnit, null);
-        eagerCount = classVisitor.overallEager;
+
     }
 
     /**
@@ -74,9 +81,6 @@ public class EagerTest extends AbstractSmell {
         return smellyElementList;
     }
 
-    public int getEagerCount() {
-        return eagerCount;
-    }
 
     /**
      * Visitor class
@@ -85,7 +89,6 @@ public class EagerTest extends AbstractSmell {
         private MethodDeclaration currentMethod = null;
         TestMethod testMethod;
         private int eagerCount = 0;
-        private int overallEager = 0;
         private List<String> productionVariables = new ArrayList<>();
         private List<String> calledMethods = new ArrayList<>();
         private String fileType;
@@ -128,7 +131,6 @@ public class EagerTest extends AbstractSmell {
 
                     //reset values for next method
                     currentMethod = null;
-                    overallEager += eagerCount;
                     eagerCount = 0;
                     productionVariables = new ArrayList<>();
                     calledMethods = new ArrayList<>();

@@ -50,10 +50,18 @@ public class GeneralFixture extends AbstractSmell {
         return smellyElementList.stream().filter(x -> x.getHasSmell()).count() >= 1;
     }
 
+    /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit, CompilationUnit productionFileCompilationUnit, String testFileName, String productionFileName) throws FileNotFoundException {
-        GeneralFixture.ClassVisitor classVisitor;
-        classVisitor = new GeneralFixture.ClassVisitor();
+        ClassVisitor classVisitor;
+        classVisitor = new ClassVisitor();
         classVisitor.visit(testFileCompilationUnit, null); //This call will populate the list of test methods and identify the setup method [visit(ClassOrInterfaceDeclaration n)]
 
         //Proceed with general fixture analysis if setup method exists

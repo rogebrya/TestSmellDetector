@@ -21,7 +21,6 @@ import java.util.List;
 public class AssertionRoulette extends AbstractSmell {
 
     private List<SmellyElement> smellyElementList;
-    private int assertionsCount = 0;
 
     public AssertionRoulette() {
         smellyElementList = new ArrayList<>();
@@ -44,18 +43,21 @@ public class AssertionRoulette extends AbstractSmell {
     }
 
     /**
+     * Returns number of elements that have a smell
+     */
+    @Override
+    public int getNumberOfSmells() {
+        return (int) smellyElementList.stream().filter(x -> x.getHasSmell()).count();
+    }
+
+    /**
      * Analyze the test file for test methods for multiple assert statements without an explanation/message
      */
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit, CompilationUnit productionFileCompilationUnit, String testFileName, String productionFileName) throws FileNotFoundException {
-        AssertionRoulette.ClassVisitor classVisitor;
-        classVisitor = new AssertionRoulette.ClassVisitor();
+        ClassVisitor classVisitor;
+        classVisitor = new ClassVisitor();
         classVisitor.visit(testFileCompilationUnit, null);
-        assertionsCount = classVisitor.overallAssertions;
-    }
-
-    public int getAssertionsCount() {
-        return assertionsCount;
     }
 
     /**
@@ -71,7 +73,6 @@ public class AssertionRoulette extends AbstractSmell {
         private MethodDeclaration currentMethod = null;
         private int assertNoMessageCount = 0;
         private int assertCount = 0;
-        private int overallAssertions = 0;
         TestMethod testMethod;
 
         // examine all methods in the test class
@@ -96,7 +97,6 @@ public class AssertionRoulette extends AbstractSmell {
 
                 //reset values for next method
                 currentMethod = null;
-                overallAssertions += assertCount;
                 assertCount = 0;
                 assertNoMessageCount = 0;
             }
@@ -112,7 +112,6 @@ public class AssertionRoulette extends AbstractSmell {
                         n.getNameAsString().startsWith(("assertEquals")) ||
                         n.getNameAsString().startsWith(("assertNotSame")) ||
                         n.getNameAsString().startsWith(("assertSame")) ||
-                        n.getNameAsString().startsWith("assertThrows") ||
                         n.getNameAsString().startsWith(("assertThat"))) {
                     assertCount++;
                     // assert methods that do not contain a message
